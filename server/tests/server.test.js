@@ -8,12 +8,14 @@ const {Todo} = require('./../models/todo');
 // Seed data
 const todos = [{
   _id: new ObjectID(),
-  text: "First test todo"
+  text: "First test todo",
+  completed: true,
+  completedAt: '333'
 }, {
   _id: new ObjectID(),
   text: "Second test todo",
-  completed: true,
-  completedAt: false
+  completed: false,
+  completedAt: null
 }];
 
 beforeEach((done) => {
@@ -162,6 +164,35 @@ describe('PATCH /todos/:id', () => {
         expect(res.body.todo.text).toBe(text);
         expect(res.body.todo.completed).toBe(true);
         expect(res.body.todo.completedAt).toBeA('number');
-      }).end(done)
+      }).end(done);
+  });
+
+  it("should return set completedAt to null when completed is updated to false", (done) => {
+    var id = todos[0]._id.toHexString();
+
+    request(app)
+      .patch(`/todos/${id}`)
+      .send({completed: false})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.completedAt).toBe(null);
+      })
+      .end(done);
+  });
+
+  it('should return a 404 if todo is not found', (done) => {
+    var hexId = new ObjectID().toHexString();
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return a 404 if id is invalid', (done) => {
+    request(app)
+      .patch('/todos/123ab')
+      .expect(404)
+      .end(done);
   });
 });
