@@ -1,3 +1,5 @@
+// process.env.NODE_ENV is only set if its on heroku
+// otherwise it will be set to development if not on heroku
 var env = process.env.NODE_ENV || 'development';
 
 console.log("env ****", env);

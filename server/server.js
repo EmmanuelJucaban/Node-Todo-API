@@ -104,6 +104,23 @@ app.patch('/todos/:id', (req, res) => {
 });
 
 
+// POST /users
+app.post("/users", (req, res) => {
+  var body = _.pick(req.body, ["email", "password"]);
+  var user = new User(body);
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+    // this user is not the same as the user sent in the promise below
+    // res.send(user);
+  }).then((token) => {
+    // this is returning the user variable
+    // we have to add on the header. we have to send the token back as an http response header
+    res.header('x-auth', token).send(user);
+  }).catch(e => res.status(400).send(e));
+});
+
+
 app.listen(port, () => {
   console.log(`Server has started on port: ${port }`);
 });
