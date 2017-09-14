@@ -8,7 +8,7 @@ var _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT;
@@ -49,7 +49,7 @@ app.get('/todos/:id', (req, res) => {
 
   Todo.findById(id).then((todo) => {
     if(!todo){
-      return res.status(404).send()
+      return res.status(404).send();
     }
 
     res.send({todo});
@@ -114,12 +114,14 @@ app.post("/users", (req, res) => {
     // this user is not the same as the user sent in the promise below
     // res.send(user);
   }).then((token) => {
-    // this is returning the user variable
     // we have to add on the header. we have to send the token back as an http response header
     res.header('x-auth', token).send(user);
   }).catch(e => res.status(400).send(e));
 });
 
+app.get('/users/me', authenticate, (req, res, next) => {
+  res.send(req.user);
+});
 
 app.listen(port, () => {
   console.log(`Server has started on port: ${port }`);
