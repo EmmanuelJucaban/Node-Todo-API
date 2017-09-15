@@ -1,28 +1,42 @@
 const {SHA256} = require('crypto-js');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-var data = {
-  id: 10
-};
+var password = '123abc!';
+
+bcrypt.genSalt(11, (err, salt) => {
+  bcrypt.hash(password, salt, (err, hash) => {
+    console.log(hash);
+  });
+});
+
+var hashedPassword = '$2a$10$.ylH4rj/.rqwo1sRcePyBO8jTKF9/q6AJOwmsc8/RrnHV3rKZvSxi';
+
+bcrypt.compare(password, hashedPassword, (err, result) => {
+  console.log(result);
+});
+// var data = {
+//   id: 10
+// };
 
 // takes the object and secret as 2nd params
 // this returns a token
  //  this is the value we return back to the user when they signup or login
 // this is also the value we store inside the tokens array in the user model
-var token = jwt.sign(data, 'secret');
-
-console.log(token);
+// var token = jwt.sign(data, 'secret');
+//
+// console.log(token);
 
 
 // verifies that the token we sent is unmodified
 // we pass the token we want to verify and then the secret
 //  returns the decoded result
-var decoded = jwt.verify(token, 'secret');
-
-console.log("Decoded ***", decoded);
-
-
-
+// var decoded = jwt.verify(token, 'secret');
+//
+// console.log("Decoded ***", decoded);
+//
+//
+//
 
 // var message = "I am user number 1";
 // // the SHA256 function returns an object

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 // This allows us to add methods to the model
 var UserSchema = new mongoose.Schema({
@@ -31,6 +32,21 @@ var UserSchema = new mongoose.Schema({
       required: true
     }
   }]
+});
+
+UserSchema.pre('save', function(next) {
+  var user = this;
+
+  if(user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
 });
 
 // this overrides the toJSON method that gets called when we return our User
