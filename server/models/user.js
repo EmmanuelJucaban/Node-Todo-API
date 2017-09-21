@@ -74,6 +74,7 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
+
 // .statics adds or modifies a model method
 UserSchema.statics.findByToken = function(token) {
   var User = this;
@@ -94,6 +95,24 @@ UserSchema.statics.findByToken = function(token) {
     'tokens.access': 'auth'
   });
 };
+
+UserSchema.statics.findByCredentials = function(email, password) {
+  var User = this;
+
+  return User.findOne({email}).then((user) => {
+    if(!user) {
+      return Promise.reject();
+    }
+
+    return bcrypt.compare(password, user.password).then((res) => {
+      if(res) {
+        return user;
+      } else {
+        return Promise.reject();
+      }
+    });
+  });
+}
 
 var User = mongoose.model('User', UserSchema);
 
