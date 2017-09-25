@@ -64,7 +64,7 @@ UserSchema.methods.generateAuthToken = function() {
   var user = this;
   var access = 'auth';
   // also add the accesss property using ES6 which is the string auth
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'secret').toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
   // push these properties into the tokens array in the schema
   user.tokens.push({access, token});
@@ -93,7 +93,7 @@ UserSchema.statics.findByToken = function(token) {
 
   try {
     // verify will throw an error if anything goes wrong
-    decoded = jwt.verify(token, 'secret');
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (e) {
     // shorthand for just returning a reject promise
     return Promise.reject();
